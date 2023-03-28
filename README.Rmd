@@ -113,11 +113,11 @@ List of sampled colors:
 ```{r}
 set.seed(seed)
 
-color <- sample(c("#a8a18f",
-                  "#d5c9a8",
-                  "#e6d5a9",
-                  "#f6e2b1",
-                  "#eeddaf"),
+color <- sample(c("a8a18f",
+                  "d5c9a8",
+                  "e6d5a9",
+                  "f6e2b1",
+                  "eeddaf"),
                 1)
 ```
 
@@ -133,14 +133,14 @@ texture_mat_small[, , 1:3] <- sample(c(0, 1), 1)
 # Create the celestial model by generating a disk that will use the texture of the simulated rings
 celestial_model <- disk(radius = runif(1, 2, 2.5), 
                      inner_radius = runif(1, 1.2, 1.5),
-     material=diffuse(color = color, 
+     material=diffuse(color = glue("#{color}"), 
                       sigma = 90,
                       image_texture = texture_mat_small)) |>
   # Add the main body, that is the "planet" in this system 
   add_object(ellipsoid(a = 1,
                        c = 1,
                        b = 1,
-                       material = diffuse(color = color))) |>
+                       material = diffuse(color = glue("#{color}")))) |>
   # Add the second body, that is the "satellite" in this system 
   add_object(ellipsoid(a = 0.05, 
                        c = 0.05,
@@ -148,7 +148,7 @@ celestial_model <- disk(radius = runif(1, 2, 2.5),
                        x = runif(1, 2, 3.5), 
                        y = runif(1, 2, 3.5), 
                        z = runif(1, 0.2, 0.5),
-                       material = diffuse(color = color))) |>
+                       material = diffuse(color = glue("#{color}")))) |>
   # Group the objects and rotate them at random; this is analog to changing the perspective from which the system is observed
   group_objects(angle=c(runif(1, -45, 45),
                         runif(1, 0, 90), 
