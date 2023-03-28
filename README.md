@@ -4,17 +4,7 @@ output: github_document
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, include = FALSE}
-# knitr options
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
 
-# Packages for README but not for generative system
-library(cowplot)
-library(ggplot2)
-```
 
 # ideal-astronomies-celestial-vanilla
 
@@ -22,23 +12,11 @@ library(ggplot2)
 <!-- badges: end -->
 
 The base code of this system is almost identical to [Ideal Astronomies](https://github.com/paezha/ideal-astronomies) but instead of black-and-white I sample colors from an astronomy photo, which are then randomized. This is the image that I use for sampling colors:
-```{r fig01, echo=FALSE, out.width="300px"}
-
-# Create empty ggplot object with caption
-fig01 <-  ggplot() +
-  labs(caption = "Source: https://deepspace.social/@hourlycosmos/110090414612838355") +
-  theme_void() +
-  theme(plot.caption = element_text(size = 15))
-
-# Draw image and empty ggplot object
-ggdraw() +
-  draw_image("inputs/948a4a5a5d5cc21e.jpeg",
-             y = 0.05) +
-  draw_plot(fig01)
-```
+<img src="figure/fig01-1.png" alt="plot of chunk fig01" width="300px" />
 
 The base code drew heavily from Tyler Morgan-Wall's tutorial to [rayrender Saturn](https://www.tylermw.com/tutorial-visualizing-saturns-appearance-from-earth-in-r/). The system uses [{rayimage}](https://www.rayimage.dev/) and [{rayrender}](https://www.rayrender.net/index.html) packages. Packages {here} and {glue} are used for file management:
-```{r}
+
+```r
 library(glue)
 library(here)
 library(rayimage)
@@ -47,7 +25,8 @@ library(rayrender)
 
 ## Generate a random seed
 
-```{r}
+
+```r
 seed <- sample.int(100000000, 1)
 ```
 
@@ -56,7 +35,8 @@ seed <- sample.int(100000000, 1)
 To simulate the rings I use as a template Tyler's code for processing the [texture]() of the rings of Saturn. A four-dimensional array simulates a slice of the rings, 125 pixels in width and 2048 pixels in depth (this would be the ring in the direction away from the planet). 
 
 Saturn's rings have several subdivisions with different widths and thicknesses. The simulated rings here have three sections: first, second, and third rings (`fr`, `sr`, and `tr`, respectively), and each will have a different parameter for the transparency of the ring (coded in `alpha`). The padding and other parameters are copied from Tyler's code, where they are accurate representations of the dimensions of the rings of Saturn.
-```{r}
+
+```r
 set.seed(seed)
 
 full_ring_slice <- array(1, c(125, 2048, 4))
@@ -79,7 +59,8 @@ full_width = ncol(half_ring_slice)
 ```
 
 This function (copied from Tyler's code) reads the slice of the ring and returns the values for color and transparency:
-```{r}
+
+```r
 return_texture = function(i, j, k) {
   distanceval = (sqrt((i - full_width-1)^2 + (j - full_width - 1)^2) + 1 ) * (padding + full_width)/full_width
   frac = distanceval - floor(distanceval)
@@ -93,7 +74,8 @@ return_texture = function(i, j, k) {
 ```
 
 A texture matrix is initialized and the transparency is read from the slice of ring with the function `return_texture`:
-```{r}
+
+```r
 texture_mat <- array(1,
                      c(2 * (full_width),
                        2 * (full_width),
@@ -110,7 +92,8 @@ texture_mat_small = render_resized(texture_mat,
 ```
 
 List of sampled colors:
-```{r}
+
+```r
 set.seed(seed)
 
 color <- sample(c("#a8a18f",
@@ -124,7 +107,8 @@ color <- sample(c("#a8a18f",
 ## Render scene
 
 The rings are the most tricky part of the code. The rest simply involves rayrendering the celestial bodies (here a "planet" and a "satellite"): 
-```{r}
+
+```r
 set.seed(seed)
 
 # Choose if the rings will be white or black matter
@@ -174,9 +158,12 @@ celestial_model |>
                height = 1600,
                clamp_value = 1.1,
                sample_method = "sobol")
+#> --------------------------Interactive Mode Controls---------------------------
+#> W/A/S/D: Horizontal Movement: | Q/Z: Vertical Movement | Up/Down: Adjust FOV | ESC: Close
+#> Left/Right: Adjust Aperture  | 1/2: Adjust Focal Distance | 3/4: Rotate Environment Light 
+#> P: Print Camera Info | R: Reset Camera |  TAB: Toggle Orbit Mode |  E/C: Adjust Step Size
+#> K: Save Keyframe | L: Reset Camera to Last Keyframe (if set) | F: Toggle Fast Travel Mode
+#> Left Mouse Click: Change Look At (new focal distance) | Right Mouse Click: Change Look At
 ```
 
-```{r echo=FALSE, out.width="800px"}
-# Display image
-knitr::include_graphics(glue("outputs/ideal-astronomy-cv-{intensity}-{color}-{seed}.png"))
-```
+<img src="outputs/ideal-astronomy-cv-62-#d5c9a8-30269429.png" alt="plot of chunk unnamed-chunk-9" width="800px" />
