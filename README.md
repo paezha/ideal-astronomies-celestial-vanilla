@@ -1,59 +1,42 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+
 
 # ideal-astronomies-celestial-vanilla
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The base code of this system is almost identical to [Ideal
-Astronomies](https://github.com/paezha/ideal-astronomies) but instead of
-black-and-white I sample colors from an astronomy photo, which are then
-randomized. This is the image that I use for sampling colors:
-<img src="README_files/figure-gfm/fig01-1.png" width="300px" />
+The base code of this system is almost identical to [Ideal Astronomies](https://github.com/paezha/ideal-astronomies) but instead of black-and-white I sample colors from an astronomy photo, which are then randomized. This is the image that I use for sampling colors:
+<img src="figure/fig01-1.png" alt="plot of chunk fig01" width="300px" />
 
-The base code drew heavily from Tyler Morgan-Wall’s tutorial to
-[rayrender
-Saturn](https://www.tylermw.com/tutorial-visualizing-saturns-appearance-from-earth-in-r/).
-The system uses [{rayimage}](https://www.rayimage.dev/) and
-[{rayrender}](https://www.rayrender.net/index.html) packages. Packages
-{here} and {glue} are used for file management:
+The base code drew heavily from Tyler Morgan-Wall's tutorial to [rayrender Saturn](https://www.tylermw.com/tutorial-visualizing-saturns-appearance-from-earth-in-r/). The system uses [{rayimage}](https://www.rayimage.dev/) and [{rayrender}](https://www.rayrender.net/index.html) packages. Packages {here} and {glue} are used for file management:
 
-``` r
+```r
 library(glue)
 library(here)
-#> here() starts at C:/Antonio/Rtistry/ideal-astronomies-celestial-vanilla
 library(rayimage)
 library(rayrender)
-#> 
-#> Attaching package: 'rayrender'
-#> The following object is masked from 'package:ggplot2':
-#> 
-#>     arrow
 ```
 
 ## Generate a random seed
 
-``` r
+
+```r
 seed <- sample.int(100000000, 1)
 ```
 
 ## Simulate rings
 
-To simulate the rings I use as a template Tyler’s code for processing
-the [texture]() of the rings of Saturn. A four-dimensional array
-simulates a slice of the rings, 125 pixels in width and 2048 pixels in
-depth (this would be the ring in the direction away from the planet).
+To simulate the rings I use as a template Tyler's code for processing the [texture]() of the rings of Saturn. A four-dimensional array simulates a slice of the rings, 125 pixels in width and 2048 pixels in depth (this would be the ring in the direction away from the planet). 
 
-Saturn’s rings have several subdivisions with different widths and
-thicknesses. The simulated rings here have three sections: first,
-second, and third rings (`fr`, `sr`, and `tr`, respectively), and each
-will have a different parameter for the transparency of the ring (coded
-in `alpha`). The padding and other parameters are copied from Tyler’s
-code, where they are accurate representations of the dimensions of the
-rings of Saturn.
+Saturn's rings have several subdivisions with different widths and thicknesses. The simulated rings here have three sections: first, second, and third rings (`fr`, `sr`, and `tr`, respectively), and each will have a different parameter for the transparency of the ring (coded in `alpha`). The padding and other parameters are copied from Tyler's code, where they are accurate representations of the dimensions of the rings of Saturn.
 
-``` r
+```r
 set.seed(seed)
 
 full_ring_slice <- array(1, c(125, 2048, 4))
@@ -75,10 +58,9 @@ padding = 66900/inc
 full_width = ncol(half_ring_slice)
 ```
 
-This function (copied from Tyler’s code) reads the slice of the ring and
-returns the values for color and transparency:
+This function (copied from Tyler's code) reads the slice of the ring and returns the values for color and transparency:
 
-``` r
+```r
 return_texture = function(i, j, k) {
   distanceval = (sqrt((i - full_width-1)^2 + (j - full_width - 1)^2) + 1 ) * (padding + full_width)/full_width
   frac = distanceval - floor(distanceval)
@@ -91,10 +73,9 @@ return_texture = function(i, j, k) {
 }
 ```
 
-A texture matrix is initialized and the transparency is read from the
-slice of ring with the function `return_texture`:
+A texture matrix is initialized and the transparency is read from the slice of ring with the function `return_texture`:
 
-``` r
+```r
 texture_mat <- array(1,
                      c(2 * (full_width),
                        2 * (full_width),
@@ -112,7 +93,7 @@ texture_mat_small = render_resized(texture_mat,
 
 List of sampled colors:
 
-``` r
+```r
 set.seed(seed)
 
 color <- sample(c("a8a18f",
@@ -125,10 +106,9 @@ color <- sample(c("a8a18f",
 
 ## Render scene
 
-The rings are the most tricky part of the code. The rest simply involves
-rayrendering the celestial bodies (here a “planet” and a “satellite”):
+The rings are the most tricky part of the code. The rest simply involves rayrendering the celestial bodies (here a "planet" and a "satellite"): 
 
-``` r
+```r
 set.seed(seed)
 
 # Choose if the rings will be white or black matter
@@ -159,7 +139,7 @@ celestial_model <- disk(radius = runif(1, 2, 2.5),
                         runif(1, 0, 90)), 
                 order_rotation = c(1, 2, 3))
 
-intensity <- 50 + sample.int(50, 1)
+intensity <- 50 + sample.int(100, 1)
 
 # Take the celestial model and add a source of light
 celestial_model |>
@@ -178,6 +158,12 @@ celestial_model |>
                height = 1600,
                clamp_value = 1.1,
                sample_method = "sobol")
+#> --------------------------Interactive Mode Controls---------------------------
+#> W/A/S/D: Horizontal Movement: | Q/Z: Vertical Movement | Up/Down: Adjust FOV | ESC: Close
+#> Left/Right: Adjust Aperture  | 1/2: Adjust Focal Distance | 3/4: Rotate Environment Light 
+#> P: Print Camera Info | R: Reset Camera |  TAB: Toggle Orbit Mode |  E/C: Adjust Step Size
+#> K: Save Keyframe | L: Reset Camera to Last Keyframe (if set) | F: Toggle Fast Travel Mode
+#> Left Mouse Click: Change Look At (new focal distance) | Right Mouse Click: Change Look At
 ```
 
-<img src="outputs/ideal-astronomy-cv-51-a8a18f-39466702.png" width="800px" />
+<img src="outputs/ideal-astronomy-cv-65-f6e2b1-74970532.png" alt="plot of chunk unnamed-chunk-9" width="800px" />

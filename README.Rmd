@@ -155,7 +155,7 @@ celestial_model <- disk(radius = runif(1, 2, 2.5),
                         runif(1, 0, 90)), 
                 order_rotation = c(1, 2, 3))
 
-intensity <- 50 + sample.int(50, 1)
+intensity <- 50 + sample.int(100, 1)
 
 # Take the celestial model and add a source of light
 celestial_model |>
